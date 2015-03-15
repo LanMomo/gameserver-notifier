@@ -21,21 +21,21 @@ def notify_master(hostname, data):
 def main():
     opts, args = getopt.getopt(sys.argv[1:], 'r:n:s', ['repeat=', 'notify=', 'show'])
 
-    show_data=False
-    hostname=False
-    repeat_delay=False
+    show_data = None
+    hostname = None
+    repeat_delay = None
 
     for opt in opts:
         if opt[0] in ('-n', '--notify'):
-            hostname=opt[1]
+            hostname = opt[1]
         elif opt[0] in ('-r', '--repeat'):
-            repeat_delay=int(opt[1])
+            repeat_delay = int(opt[1])
         elif opt[0] in ('-s', '--show'):
-            show_data=True
+            show_data = True
 
     if not args:
         print('No game_id specified')
-        exit()
+        exit(1)
     game_id = args[0]
 
     while True:
@@ -45,7 +45,7 @@ def main():
         if hostname:
             notify_master(hostname, query_result)
         if not repeat_delay:
-            break
+            exit(0)
         time.sleep(repeat_delay)
 
 if __name__ == '__main__':
