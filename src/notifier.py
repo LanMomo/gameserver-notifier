@@ -4,6 +4,7 @@ import subprocess
 import time
 import json
 import getopt
+import requests
 
 def query_server(game_id):
     data = {}
@@ -14,9 +15,10 @@ def query_server(game_id):
     return data
 
 def notify_master(hostname, data):
-    payload = json.dumps(data)
-    requests.post(hostname, data=payload)
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
+    requests.post('http://' + hostname + '/api/servers',
+        data=json.dumps(data), headers=headers)
 
 # python3 notifier.py --delay=30 --notify=lanmomo.ca css
 def main():
