@@ -1,7 +1,9 @@
 #!/usr/bin/env/python3
+import sys
 import subprocess
 import time
 import json
+import getopt
 
 def query_server(game_id):
     data = {}
@@ -12,19 +14,39 @@ def query_server(game_id):
 
 def notify_master(hostname, data):
     payload = json.dumps(data)
-    if not hostname:
-        print(payload)
-    else:
-        requests.post(hostname, data=payload)
+    requests.post(hostname, data=payload)
 
 
-# python3 notifier.py --notify lanmomo.ca --gameid css
+# python3 notifier.py --delay=30 --notify=lanmomo.ca css
 def main():
-    hostname = None
-    game_id = 'css'
+    opts, args = getopt.getopt(sys.argv[1:], 'r:n:s', ['repeat=', 'notify=', 'show'])
+
+    show_data=False
+    hostname=False
+    repeat_delay=False
+
+    for opt in opts:
+        if opt[0] in ('-n', '--notify'):
+            hostname=opt[1]
+        elif opt[0] in ('-r', '--repeat'):
+            repeat_delay=int(opt[1])
+        elif opt[0] in ('-s', '--show'):
+            show_data=True
+
+    if not args:
+        print('No game_id specified')
+        exit()
+    game_id = args[0]
+
     while True:
-        notify_master(hostname, query_server(game_id))
-        time.sleep(30)
+        query_result = query_server(game_id)
+        if show_data:
+            print(query_result)
+        if hostname:
+            notify_master(hostname, query_result)
+        if not repeat_delay:
+            break
+        time.sleep(repeat_delay)
 
 if __name__ == '__main__':
     main()
