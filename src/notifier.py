@@ -4,24 +4,8 @@ import time
 import json
 import getopt
 import requests
-import subprocess
+import protocols
 
-class Protocol:
-    def query_server(self, hostname, port):
-        data = {}
-        command_ip = "ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v '127.' | head -n 1"
-        data['hostname'] = subprocess.check_output("hostname", shell=True).rstrip().decode()
-        data['lan_ip'] = subprocess.check_output(command_ip, shell=True).rstrip().decode()
-        return data
-
-class GameSpy(Protocol):
-    pass
-
-class Main:
-    protocols = {
-        "gamespy": GameSpy,
-        "base": Protocol,
-    }
 
 def notify_master(hostname, data):
     payload = json.dumps(data)
@@ -35,7 +19,7 @@ def main():
     show_data = None
     hostname = None
     repeat_delay = None
-    protocol_name = "Base"
+    protocol_name = "None"
     port=None
 
     for opt in opts:
@@ -55,14 +39,18 @@ def main():
         exit(1)
     game_id = args[0]
 
-    try:
-        protocol_class = Main.protocols[protocol_name.lower()]
-    except IndexError:
-        protocol_class = Protocol()
-    p = protocol_class()
+    # What protocol does Trackmania uses?
+    # Call of Duty 4 uses Quake 3 protocol
+
+    if protocol_name.lower() == "gamespy": # Unreal, GMOD, Minecraft (1.8+)
+        query_server = protocols.gamespy_query_server
+    elif protocol_name.lower() in ("a2s", "source"): # CSS, TF2, Natural Selection, CSGO,
+        query_server = protocols.a2s_query_server
+    else :
+        query_server = protocols.network_identity
 
     while True:
-        query_result = p.query_server("localhost", port)
+        query_result = query_server(port) # Server is always the current machine
         query_result['game_id'] = game_id
 
         if show_data:
