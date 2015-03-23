@@ -48,8 +48,11 @@ def main():
             if protocol == None :
                 print("%s does not have a pre-assigned protocol." % game_id)
                 continue
-        elif len(parts) == 3 and isinstance(parts[1], str) and isinstance(parts[2], int):
-            protocol = (parts[1].lower, parts[2])
+        elif len(parts) == 3 and isinstance(parts[1], str) and parts[2].isdigit():
+            protocol = (parts[1].lower, int(parts[2]))
+        else:
+            print("Incorrectly formatted argument : ", arg )
+            continue
         game_protocol_pair = (game_id, protocol)
         games_on_server.append(game_protocol_pair)
 
