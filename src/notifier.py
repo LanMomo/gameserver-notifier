@@ -21,23 +21,8 @@ def query_server(protocol_name, port):
 
     return query_method(port) # Server is always the current machine
 
-# python3 notifier.py -r 30 -n lanmomo.ca css dod:a2s:27015
-def main():
-    opts, args = getopt.getopt(sys.argv[1:], 'r:n:s', ['repeat=', 'notify=', 'show'])
-
-    show_data = None
-    hostname = None
-    repeat_delay = None
-
-    for opt in opts:
-        if opt[0] in ('-n', '--notify'):
-            hostname = opt[1]
-        elif opt[0] in ('-r', '--repeat'):
-            repeat_delay = int(opt[1])
-        elif opt[0] in ('-s', '--show'):
-            show_data = True
-
-    games_on_server = [];
+def parse_args(args):
+    games_on_server = []
 
     for arg in args:
         # ut2004:gamespy:1337
@@ -55,6 +40,25 @@ def main():
             continue
         game_protocol_pair = (game_id, protocol)
         games_on_server.append(game_protocol_pair)
+        return games_on_server
+
+# python3 notifier.py -r 30 -n lanmomo.ca css dod:a2s:27015
+def main():
+    opts, args = getopt.getopt(sys.argv[1:], 'r:n:s', ['repeat=', 'notify=', 'show'])
+
+    show_data = None
+    hostname = None
+    repeat_delay = None
+
+    for opt in opts:
+        if opt[0] in ('-n', '--notify'):
+            hostname = opt[1]
+        elif opt[0] in ('-r', '--repeat'):
+            repeat_delay = int(opt[1])
+        elif opt[0] in ('-s', '--show'):
+            show_data = True
+
+    games_on_server = parse_args(args)
 
     if not games_on_server:
         print('No valid game specified')
