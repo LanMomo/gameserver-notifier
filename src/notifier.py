@@ -59,19 +59,21 @@ def main():
     game_id = args[0]
 
     while True:
-        query_result = query_server(token, game_id)
+        try:
+            query_result = query_server(token, game_id)
 
-        if verbose:
-            print(query_result)
+            if verbose:
+                print(query_result)
 
-        result = notify_master(url, query_result)
+            result = notify_master(url, query_result)
 
-        if verbose:
-            print(result)
+            if verbose:
+                print(result)
 
+        except Exception as e:
+            print(e)
         if not interval:
             break
-
         time.sleep(interval)
 
 
